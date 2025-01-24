@@ -1,33 +1,73 @@
-import { useState } from "react";
+import React, { useEffect, useRef,useState } from 'react';
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import './App.css';
 
 function App() {
-
-  const [showDescription, setShowDescription] = useState({
+  type SaladState = {
+    cesar: boolean;
+    tropical: boolean;
+    suculenta: boolean;
+  };
+  
+  const [showDescription, setShowDescription] = useState<SaladState>({
     cesar: false,
     tropical: false,
     suculenta: false,
   });
-
-  const toggleDescription = (salad:any) => {
+  
+  const toggleDescription = (salad: keyof SaladState) => {
     setShowDescription((prevState) => ({
       ...prevState,
       [salad]: !prevState[salad],
     }));
   };
 
+  // Custom hook for scroll-triggered animations
+  const useScrollAnimation = (animationClass: string) => {
+    const ref = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.1 } // Trigger when 10% of element is visible
+      );
+
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+
+      return () => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      };
+    }, []);
+
+    return {
+      ref,
+      className: isVisible ? `${animationClass}` : 'opacity-0'
+    };
+  };
+
   return (
     <div className="bg-green-50 min-h-screen text-gray-800">
       {/* Hero Section */}
       <header
-  className="bg-gradient-to-r from-green-500 to-green-600 text-white py-[19rem]"
-  style={{
-    backgroundImage: "url('./fondoMonstera.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat"
-  }}
->
+        {...useScrollAnimation('animate-fade-in-down')}
+        className="bg-gradient-to-r from-green-500 to-green-600 text-white py-[19rem]"
+        style={{
+          backgroundImage: "url('./fondoMonstera.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+      >
   <div className="container mx-auto px-4 text-center">
     <h1 className="text-5xl md:text-7xl font-bold uppercase mb-4 animate-fade-in-down">
       La Monstera
@@ -40,53 +80,51 @@ function App() {
 
 
       {/* Vision & Mission Section */}
-      <section className="py-20">
+      <section 
+  {...useScrollAnimation('animate-fade-in-left')}
+  className="py-20 ml-8"
+>
   <div className="container mx-auto px-4">
     <div className="grid md:grid-cols-2 gap-12 items-center">
       <div className="space-y-8 animate-fade-in-left">
         <div>
           <h2 className="text-9xl font-bold text-green-600 mb-4">Nuestra Visión</h2>
-          <p className="text-lg leading-relaxed font-semibold">
+          
+          <p className="text-lg leading-relaxed font-semibold text-green-900 text-right">
             Ser la opción preferida para quienes buscan una alimentación saludable, sostenible y deliciosa. Nuestro compromiso no solo es ofrecer productos frescos, sino también hacerlo de manera responsable con el medio ambiente.
           </p>
-          <p className="text-lg leading-relaxed font-semibold">
+          <p className="text-lg leading-relaxed font-semibold text-green-900 text-right">
             Queremos crear un impacto positivo, ayudando a nuestros clientes a tomar decisiones alimenticias más conscientes que beneficien tanto su salud como al entorno. A través de la innovación, buscamos transformar la manera en que las personas perciben la comida saludable.
           </p>
-          <p className="text-lg leading-relaxed font-semibold">
+          <p className="text-lg leading-relaxed font-semibold text-green-900 text-right">
             Aspiramos a ser más que una opción alimenticia; queremos ser una fuente de inspiración para llevar un estilo de vida equilibrado y sostenible.
           </p>
         </div>
       </div>
-      <div className="flex justify-center animate-fade-in-bottom">
-        <div>
-          <img
-            src="./vision.png"
-            alt="Visión de la empresa"
-            className="rounded-lg shadow-lg max-w-full"
-          />
-        </div>
-      </div>
+
+      <div className="flex justify-center animate-fade-in-bottom relative">
+  
+  <div>
+    <img
+      src="./vision.png"
+      alt="Visión de la empresa"
+      className="rounded-lg shadow-lg max-w-full"
+    />
+  </div>
+</div>
+
     </div>
   </div>
 </section>
 
-<section className="py-20">
+
+<section 
+        {...useScrollAnimation('animate-fade-in-left')}
+        className="py-20 mr-8"
+      >
   <div className="container mx-auto px-4">
     <div className="grid md:grid-cols-2 gap-12 items-center">
-      <div className="space-y-8 animate-fade-in-left">
-        <div>
-          <h2 className="text-9xl font-bold text-green-600 mb-4">Nuestra Misión</h2>
-          <p className="text-lg leading-relaxed font-semibold">
-            Ofrecer ensaladas frescas hechas con ingredientes de calidad y un toque único de creatividad. Cada plato es una obra de arte que refleja nuestro compromiso con la frescura, el sabor y el bienestar.
-          </p>
-          <p className="text-lg leading-relaxed font-semibold">
-            Nos dedicamos a crear experiencias únicas para nuestros clientes, brindándoles una variedad de opciones que no solo satisfacen su paladar, sino también su deseo de cuidar su salud de manera deliciosa.
-          </p>
-          <p className="text-lg leading-relaxed font-semibold">
-            Queremos ser el puente entre la conveniencia y la salud, ofreciendo opciones rápidas, accesibles y nutritivas que se adapten a las necesidades de todos, siempre con un enfoque en la calidad de los ingredientes.
-          </p>
-        </div>
-      </div>
+      
       <div className="flex justify-center animate-fade-in-bottom">
         <div>
           <img
@@ -94,6 +132,22 @@ function App() {
             alt="Misión de la empresa"
             className="rounded-lg shadow-lg max-w-full"
           />
+        </div>
+      </div>
+      <div className="space-y-8 animate-fade-in-left">
+        <div>
+          <h2 className="text-9xl font-bold text-green-600 mb-4">Nuestra Misión</h2>
+          
+
+          <p className="text-lg leading-relaxed font-semibold text-green-900">
+            Ofrecer ensaladas frescas hechas con ingredientes de calidad y un toque único de creatividad. Cada plato es una obra de arte que refleja nuestro compromiso con la frescura, el sabor y el bienestar.
+          </p>
+          <p className="text-lg leading-relaxed font-semibold text-green-900">
+            Nos dedicamos a crear experiencias únicas para nuestros clientes, brindándoles una variedad de opciones que no solo satisfacen su paladar, sino también su deseo de cuidar su salud de manera deliciosa.
+          </p>
+          <p className="text-lg leading-relaxed font-semibold text-green-900">
+            Queremos ser el puente entre la conveniencia y la salud, ofreciendo opciones rápidas, accesibles y nutritivas que se adapten a las necesidades de todos, siempre con un enfoque en la calidad de los ingredientes.
+          </p>
         </div>
       </div>
     </div>
@@ -281,7 +335,7 @@ function App() {
               href="#"
               className="inline-block px-6 py-3 bg-white rounded-lg shadow-md text-green-600 font-semibold hover:text-green-700 hover:shadow-lg transition-all duration-300"
             >
-              Twitter
+              WhatsApp
             </a>
           </div>
         </div>
